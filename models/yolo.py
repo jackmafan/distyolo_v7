@@ -134,7 +134,10 @@ class IDetect(nn.Module):
                 if self.grid[i].shape[2:4] != x[i].shape[2:4]:
                     self.grid[i] = self._make_grid(nx, ny).to(x[i].device)
 
+                #距離不應該過sigmoid
+                tmp = x[i][...,5]
                 y =  x[i].sigmoid()
+                y[...,5] = tmp
                 y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + self.grid[i]) * self.stride[i]  # xy
                 y[..., 2:4] = (y[..., 2:4] * 2) ** 2 * self.anchor_grid[i]  # wh
                 z.append(y.view(bs, -1, self.no))
@@ -154,7 +157,10 @@ class IDetect(nn.Module):
                 if self.grid[i].shape[2:4] != x[i].shape[2:4]:
                     self.grid[i] = self._make_grid(nx, ny).to(x[i].device)
 
-                y = x[i].sigmoid()
+                #距離不應該過sigmoid
+                tmp = x[i][...,5]
+                y =  x[i].sigmoid()
+                y[...,5] = tmp
                 if not torch.onnx.is_in_onnx_export():
                     y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + self.grid[i]) * self.stride[i]  # xy
                     y[..., 2:4] = (y[..., 2:4] * 2) ** 2 * self.anchor_grid[i]  # wh
