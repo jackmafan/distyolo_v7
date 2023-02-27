@@ -83,7 +83,9 @@ def torch2onnx():
     onnx_path = opt.name
 
     # to onnx
-    torch.onnx.export(model, img, onnx_path, verbose=False, input_names=input_names, output_names=output_names)
+    # opset_version=11 for jetson nano
+    torch.onnx.export(model, img, onnx_path, verbose=False, input_names=input_names, 
+                      output_names=output_names, opset_version=11)
 
     # test onnx
     img = np.array([tmp], dtype=np.float32)
