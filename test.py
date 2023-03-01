@@ -208,13 +208,20 @@ def test(data,
                         # Prediction to target ious
                         ious, i = box_iou(predn[pi, :4], tbox[ti]).max(1)  # best ious, indices #跟dist無關
 
+                        #找到detections: iou以0.3為界 不然太少資料
+                        my_set = set()
+                        for j in (ious > 0.4).nonzero(as_tuple = False):
+                            d = ti[i[j]]  # detected target
+                            my_p = pi[i[j]] #取得索引
+                            if d.item() not in my_set:
+                                distance_pair.append([cls, labels[d,5],150 * predn[my_p,5],"EOL"]) #append必要資訊
+                            
                         # Append detections
                         detected_set = set()
                         for j in (ious > iouv[0]).nonzero(as_tuple=False): #iouv是threshold 0.5到0.95切10等分
                             d = ti[i[j]]  # detected target
                             my_p = pi[i[j]] #取得索引
                             if d.item() not in detected_set:
-                                distance_pair.append([cls, labels[d,5],predn[my_p,5],"EOL"]) #append必要資訊
                                 detected_set.add(d.item())
                                 detected.append(d)
                                 correct[pi[j]] = ious[j] > iouv  # iou_thres is 1xn
@@ -234,7 +241,8 @@ def test(data,
             Thread(target=plot_images, args=(img, output_to_target(out), paths, f, names), daemon=True).start()
 
     #檢測distance_pair的正確性
-    print(distance_pair)
+    for my_element in distance_pair:
+        print(my_element)
     
     # Compute statistics 暫時忽略dist來計算AP (不更動此段程式碼)
     stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy 
