@@ -14,6 +14,3 @@ https://www.mdpi.com/2076-3417/12/3/1354
 ```bash
     $ source onnx2trt.sh best-nms.onnx best.trt
 ```
-## Using Logitecg C270 camera
-
-### install opencv
